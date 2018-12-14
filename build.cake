@@ -36,7 +36,7 @@ TaskSetup(setupContext =>
 {
    if(TeamCity.IsRunningOnTeamCity)
    {
-      // TeamCity.WriteStartBuildBlock(setupContext.Task.Description ?? setupContext.Task.Name);
+      TeamCity.WriteStartBuildBlock(setupContext.Task.Description ?? setupContext.Task.Name);
 
       TeamCity.WriteStartProgress(setupContext.Task.Description ?? setupContext.Task.Name);
    }
@@ -48,7 +48,7 @@ TaskTeardown(teardownContext =>
    {
       TeamCity.WriteEndProgress(teardownContext.Task.Description ?? teardownContext.Task.Name);
 
-      // TeamCity.WriteEndBuildBlock(teardownContext.Task.Description ?? teardownContext.Task.Name);
+      TeamCity.WriteEndBuildBlock(teardownContext.Task.Description ?? teardownContext.Task.Name);
    }
 });
 
