@@ -115,13 +115,16 @@ Task("Run-Tests")
 
    var testResultsFile = System.IO.Path.Combine(temporaryFolder, "testResults.trx");
 
-   MSTest(testDlls, new MSTestSettings() {
+   // MSTest(testDlls, new MSTestSettings() {
+   //    ResultsFile = testResultsFile
+   // });
+   VSTest(testDlls, new VSTestSettings() {
       ResultsFile = testResultsFile
    });
 
    if(TeamCity.IsRunningOnTeamCity)
    {
-      TeamCity.ImportData("mstest", testResultsFile);
+      TeamCity.ImportData("vstest", testResultsFile);
    }
 });
 
@@ -144,7 +147,8 @@ Task("Analyse-Test-Coverage")
    var testResultsFile = System.IO.Path.Combine(temporaryFolder, "testResults.trx");
 
    DotCoverCover(tool => {
-         tool.MSTest(testDlls, new MSTestSettings() {
+//         tool.MSTest(testDlls, new MSTestSettings() {
+         tool.VSTest(testDlls, new VSTestSettings() {
             ResultsFile = testResultsFile
          });
       },
@@ -156,7 +160,7 @@ Task("Analyse-Test-Coverage")
 
    if(TeamCity.IsRunningOnTeamCity)
    {
-      TeamCity.ImportData("mstest", testResultsFile);
+      TeamCity.ImportData("vstest", testResultsFile);
    }
 
    DotCoverReport(coverageResultFile,
