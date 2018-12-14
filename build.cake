@@ -32,27 +32,27 @@ Teardown(ctx =>
    Information("Finished running tasks.");
 });
 
-TaskSetup(setupContext =>
-{
-   if(TeamCity.IsRunningOnTeamCity)
-   {
-//      TeamCity.WriteStartBuildBlock(setupContext.Task.Description ?? setupContext.Task.Name);
-      TeamCity.WriteStartBlock(setupContext.Task.Name);
+// TaskSetup(setupContext =>
+// {
+//    if(TeamCity.IsRunningOnTeamCity)
+//    {
+// //      TeamCity.WriteStartBuildBlock(setupContext.Task.Description ?? setupContext.Task.Name);
+//       TeamCity.WriteStartBlock(setupContext.Task.Name);
 
-//      TeamCity.WriteStartProgress(setupContext.Task.Description ?? setupContext.Task.Name);
-   }
-});
+// //      TeamCity.WriteStartProgress(setupContext.Task.Description ?? setupContext.Task.Name);
+//    }
+// });
 
-TaskTeardown(teardownContext =>
-{
-   if(TeamCity.IsRunningOnTeamCity)
-   {
-//      TeamCity.WriteEndProgress(teardownContext.Task.Description ?? teardownContext.Task.Name);
+// TaskTeardown(teardownContext =>
+// {
+//    if(TeamCity.IsRunningOnTeamCity)
+//    {
+// //      TeamCity.WriteEndProgress(teardownContext.Task.Description ?? teardownContext.Task.Name);
 
-      TeamCity.WriteEndBlock(teardownContext.Task.Name);
-//      TeamCity.WriteEndBuildBlock(teardownContext.Task.Description ?? teardownContext.Task.Name);
-   }
-});
+//       TeamCity.WriteEndBlock(teardownContext.Task.Name);
+// //      TeamCity.WriteEndBuildBlock(teardownContext.Task.Description ?? teardownContext.Task.Name);
+//    }
+// });
 
 ///////////////////////////////////////////////////////////////////////////////
 // TASKS
@@ -76,7 +76,10 @@ Task("Clean")
 
    if(DirectoryExists(temporaryFolder))
    {
-      DeleteDirectory(temporaryFolder, true);
+      DeleteDirectory(temporaryFolder, new DeleteDirectorySettings {
+         Recursive = true,
+         Force = true
+      });
    }
 
    CreateDirectory(temporaryFolder);
@@ -118,7 +121,7 @@ Task("Run-Tests")
       Information("\t" + testDll);
    }
 
-   var testResultsFile = System.IO.Path.Combine(temporaryFolder, "testResults.trx");
+//   var testResultsFile = System.IO.Path.Combine(temporaryFolder, "testResults.trx");
 
    // MSTest(testDlls, new MSTestSettings() {
    //    ResultsFile = testResultsFile
@@ -169,21 +172,20 @@ Task("Analyse-Test-Coverage")
    //    TeamCity.ImportData("vstest", testResultsFile);
    // }
 
-   DotCoverReport(coverageResultFile,
-      System.IO.Path.Combine(temporaryFolder, "coverageResult.html"),
-      new DotCoverReportSettings {
-         ReportType = DotCoverReportType.HTML
-      });
+   // DotCoverReport(coverageResultFile,
+   //    System.IO.Path.Combine(temporaryFolder, "coverageResult.html"),
+   //    new DotCoverReportSettings {
+   //       ReportType = DotCoverReportType.HTML
+   //    });
 
-   if(TeamCity.IsRunningOnTeamCity)
-   {
-      TeamCity.ImportDotCoverCoverage(coverageResultFile);
-   }
+   // if(TeamCity.IsRunningOnTeamCity)
+   // {
+   //    TeamCity.ImportDotCoverCoverage(coverageResultFile);
+   // }
 });
 
 Task("Create-NuGet-Package")
 .Description("Create NuGet package")
-//.IsDependentOn("Analyse-Test-Coverage")
 .IsDependentOn("Run-Tests")
 .Does(() => {
    try{
