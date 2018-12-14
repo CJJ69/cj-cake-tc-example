@@ -118,10 +118,9 @@ Task("Run-Tests")
    //    ResultsFile = testResultsFile
    // });
    VSTest(testDlls, new VSTestSettings() {
-//      LogFileName = testResultsFile
-Logger = "trx",
-InIsolation = true,
-EnableCodeCoverage = true
+      Logger = "trx",
+      InIsolation = true,
+      EnableCodeCoverage = true
    });
 
    // if(TeamCity.IsRunningOnTeamCity)
@@ -181,11 +180,16 @@ Task("Create-NuGet-Package")
 //.IsDependentOn("Analyse-Test-Coverage")
 .IsDependentOn("Run-Tests")
 .Does(() => {
-   var nuGetPackSettings = new NuGetPackSettings {
-      OutputDirectory = artifactsFolder
-   };
+   try{
+      var nuGetPackSettings = new NuGetPackSettings {
+         OutputDirectory = artifactsFolder
+      };
 
-   NuGetPack(nuspec, nuGetPackSettings);
+      NuGetPack(nuspec, nuGetPackSettings);
+   }
+   catch(Exception ex){
+      Information("error {0}", ex.Message);
+   }
 });
 
 Task("Publish-Artifacts-On-TeamCity")
