@@ -59,7 +59,7 @@ TaskTeardown(teardownContext =>
 Task("Default")
 .IsDependentOn("Publish-Artifacts-On-TeamCity")
 .Does(() => {
-   Information("Default Task")
+   Information("Default Task");
 });
 
 Task("Clean")
@@ -95,7 +95,7 @@ Task("Build")
       settings
          .SetConfiguration(configuration)
          .SetMSBuildPlatform(MSBuildPlatform.x86)
-         .SetVerbosity(Verbosity.Minimal)
+         .SetVerbosity(Verbosity.Normal)
          .UseToolVersion(MSBuildToolVersion.VS2017));
 });
 
@@ -178,7 +178,8 @@ Task("Analyse-Test-Coverage")
 
 Task("Create-NuGet-Package")
 .Description("Create NuGet package")
-.IsDependentOn("Analyse-Test-Coverage")
+//.IsDependentOn("Analyse-Test-Coverage")
+.IsDependentOn("Run-Tests")
 .Does(() => {
    var nuGetPackSettings = new NuGetPackSettings {
       OutputDirectory = artifactsFolder
