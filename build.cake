@@ -119,13 +119,16 @@ Task("Run-Tests")
    //    ResultsFile = testResultsFile
    // });
    VSTest(testDlls, new VSTestSettings() {
-      LogFileName = testResultsFile
+//      LogFileName = testResultsFile
+Logger = "trx",
+InIsolation = true,
+EnableCodeCoverage = true
    });
 
-   if(TeamCity.IsRunningOnTeamCity)
-   {
-      TeamCity.ImportData("vstest", testResultsFile);
-   }
+   // if(TeamCity.IsRunningOnTeamCity)
+   // {
+   //    TeamCity.ImportData("vstest", testResultsFile);
+   // }
 });
 
 Task("Analyse-Test-Coverage")
@@ -146,22 +149,22 @@ Task("Analyse-Test-Coverage")
 
    var testResultsFile = System.IO.Path.Combine(temporaryFolder, "testResults.trx");
 
-   DotCoverCover(tool => {
+//   DotCoverCover(tool => {
 //         tool.MSTest(testDlls, new MSTestSettings() {
-         tool.VSTest(testDlls, new VSTestSettings() {
-            ResultsFile = testResultsFile
-         });
-      },
-      new FilePath(coverageResultFile),
-      new DotCoverCoverSettings()
-         .WithFilter("+:Application")
-         .WithFilter("-:Application.*Tests")
-      );
+         // tool.VSTest(testDlls, new VSTestSettings() {
+         //    ResultsFile = testResultsFile
+         // });
+      // },
+      // new FilePath(coverageResultFile),
+      // new DotCoverCoverSettings()
+      //    .WithFilter("+:Application")
+      //    .WithFilter("-:Application.*Tests")
+      // );
 
-   if(TeamCity.IsRunningOnTeamCity)
-   {
-      TeamCity.ImportData("vstest", testResultsFile);
-   }
+   // if(TeamCity.IsRunningOnTeamCity)
+   // {
+   //    TeamCity.ImportData("vstest", testResultsFile);
+   // }
 
    DotCoverReport(coverageResultFile,
       System.IO.Path.Combine(temporaryFolder, "coverageResult.html"),
