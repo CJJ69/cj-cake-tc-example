@@ -36,9 +36,10 @@ TaskSetup(setupContext =>
 {
    if(TeamCity.IsRunningOnTeamCity)
    {
-      TeamCity.WriteStartBuildBlock(setupContext.Task.Description ?? setupContext.Task.Name);
+//      TeamCity.WriteStartBuildBlock(setupContext.Task.Description ?? setupContext.Task.Name);
+      TeamCity.WriteStartBlock(setupContext.Task.Name);
 
-      TeamCity.WriteStartProgress(setupContext.Task.Description ?? setupContext.Task.Name);
+//      TeamCity.WriteStartProgress(setupContext.Task.Description ?? setupContext.Task.Name);
    }
 });
 
@@ -46,9 +47,10 @@ TaskTeardown(teardownContext =>
 {
    if(TeamCity.IsRunningOnTeamCity)
    {
-      TeamCity.WriteEndProgress(teardownContext.Task.Description ?? teardownContext.Task.Name);
+//      TeamCity.WriteEndProgress(teardownContext.Task.Description ?? teardownContext.Task.Name);
 
-      TeamCity.WriteEndBuildBlock(teardownContext.Task.Description ?? teardownContext.Task.Name);
+      TeamCity.WriteEndBlock(teardownContext.Task.Name);
+//      TeamCity.WriteEndBuildBlock(teardownContext.Task.Description ?? teardownContext.Task.Name);
    }
 });
 
@@ -91,12 +93,16 @@ Task("Build")
 .Description("Build solution")
 .IsDependentOn("Restore-NuGet-Packages")
 .Does(() => {
+   TeamCity.WriteStartProgress("Build solution");
+
    MSBuild(solution, settings =>
       settings
          .SetConfiguration(configuration)
          .SetMSBuildPlatform(MSBuildPlatform.x86)
          .SetVerbosity(Verbosity.Normal)
          .UseToolVersion(MSBuildToolVersion.VS2017));
+
+   TeamCity.WriteEndProgress("Build solution");
 });
 
 Task("Run-Tests")
