@@ -119,7 +119,7 @@ Task("Run-Tests")
    //    ResultsFile = testResultsFile
    // });
    VSTest(testDlls, new VSTestSettings() {
-      ResultsFile = testResultsFile
+      LogFileName = testResultsFile
    });
 
    if(TeamCity.IsRunningOnTeamCity)
