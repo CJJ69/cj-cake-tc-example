@@ -57,12 +57,10 @@ TaskTeardown(teardownContext =>
 ///////////////////////////////////////////////////////////////////////////////
 
 Task("Default")
-.IsDependentOn("Clean")
-.IsDependentOn("Restore-NuGet-Packages")
-.IsDependentOn("Build")
-.IsDependentOn("Analyse-Test-Coverage")
-.IsDependentOn("Create-NuGet-Package")
-.IsDependentOn("Publish-Artifacts-On-TeamCity");
+.IsDependentOn("Publish-Artifacts-On-TeamCity")
+.Does(() => {
+   Information("Default Task")
+});
 
 Task("Clean")
 .Description("Create and clean folders with results")
@@ -84,12 +82,14 @@ Task("Clean")
 
 Task("Restore-NuGet-Packages")
 .Description("Restore NuGet packages")
+.IsDependentOn("Clean")
 .Does(() => {
    NuGetRestore(solution);
 });
 
 Task("Build")
 .Description("Build solution")
+.IsDependentOn("Restore-NuGet-Packages")
 .Does(() => {
    MSBuild(solution, settings =>
       settings
@@ -101,7 +101,6 @@ Task("Build")
 
 Task("Run-Tests")
 .Description("Run tests")
-.IsDependentOn("Clean")
 .IsDependentOn("Build")
 .Does(() => {
    var testDllsPattern = string.Format("./**/bin/{0}/*.*Tests.dll", configuration);
@@ -133,8 +132,7 @@ EnableCodeCoverage = true
 
 Task("Analyse-Test-Coverage")
 .Description("Analyse code coverage by tests")
-.IsDependentOn("Clean")
-.IsDependentOn("Build")
+.IsDependentOn("Run-Tests")
 .Does(() => {
    var coverageResultFile = System.IO.Path.Combine(temporaryFolder, "coverageResult.dcvr");
 
@@ -180,7 +178,7 @@ Task("Analyse-Test-Coverage")
 
 Task("Create-NuGet-Package")
 .Description("Create NuGet package")
-.IsDependentOn("Build")
+.IsDependentOn("Analyse-Test-Coverage")
 .Does(() => {
    var nuGetPackSettings = new NuGetPackSettings {
       OutputDirectory = artifactsFolder
@@ -191,8 +189,7 @@ Task("Create-NuGet-Package")
 
 Task("Publish-Artifacts-On-TeamCity")
 .Description("Publish artifacts on TeamCity")
-.IsDependentOn("Build")
-.IsDependentOn("Analyse-Test-Coverage")
+.IsDependentOn("Create-NuGet-Package")
 .WithCriteria(TeamCity.IsRunningOnTeamCity)
 .Does(() => {
    TeamCity.PublishArtifacts(artifactsFolder);
